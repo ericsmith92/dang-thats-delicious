@@ -24,14 +24,17 @@ exports.getStores = async (req, res) => {
 
 exports.editStore = async (req, res) => {
     //1. find store given the ID
-    const store = await Store.findOne({_id : req.params.id})
+    const store = await Store.findOne({_id : req.params.id});
+    console.log(store);
     //2. Confirm they are the owner of the store
     //3. Render out the edit form so the user can update their store
     res.render('editStore', {title: `Edit ${store.name}`, store});
 }
 
 exports.updateStore = async (req, res) => {
-    //1. Find and update the store
+    //1. Set location data to be a Point after update
+    req.body.location.type = 'Point';
+    //2. Find and update the store
     const store = await Store.findOneAndUpdate({ _id: req.params.id }, req.body, {
         new: true,
         runValidators: true
