@@ -1,6 +1,20 @@
 const mongoose = require('mongoose');
-
 const Store = mongoose.model('Store');
+const multer = require('multer');
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    fileFilter(req, file, next){
+        const isPhoto = file.mimetype.startsWith('image/');
+        if(isPhoto){
+            next(null, true);
+        } else {
+            next({message: `That filetype isn't allowed!`}, false);
+        }
+    }
+};
+const jimp = require('jimp');
+//we will use uuid package for unique names without handling logic ourselves
+const uuid = require('uuid');
 
 exports.homePage = (req, res) => {
     res.render('index', {title: 'Home'});
@@ -8,6 +22,33 @@ exports.homePage = (req, res) => {
 
 exports.addStore = (req, res) => {
     res.render('editStore', {title: 'Add Store'});
+}
+
+//we need our middleware here, before create/update to handle upload
+//remember, we are simply reading it into memory here
+exports.upload = multer(multerOptions).single('photo');
+
+/*now, lets add middleware to actually resize the photo, which is currently just stored in memory
+and not actually written anywhere
+*/
+
+exports.resize = async (req, res, next) => {
+    //check if there is no new file to resize
+    if( !req.file ){
+        next(); //skip to next middlewares
+        return;
+    }
+
+    const extension = req.file.mimetype.split('/')[1];
+    /*lets put the photo on the request body, remember in createStore we save it 
+       using the body, so putting it here will ensure it is saved*/
+    req.body.photo = `${uuid.v4()}.${extension}`;
+    //now we resize
+    const photo = await jimp.read(req.file.buffer);
+    await photo.resize(800, jimp.AUTO);
+    await photo.write(`./public/uploads/${req.body.photo}`);
+    //once we have written the photo to our filesystem, keep going!
+    next();
 }
 
 exports.createStore = async (req, res) => {
