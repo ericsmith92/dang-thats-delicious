@@ -53,8 +53,20 @@ storeSchema.pre('save', async function(next){
     }
 
     next();
-
-    //TODO: Add logic for unique slugs
 });
+
+//we use .statics to add our own custom methods to our Model
+//we need to use proper function and not => arrow function because we need to refer to keyword this
+//we are binding this to the model
+//the array is the 'pipeline', where we are aggregating our data 
+
+storeSchema.statics.getTagsList = function() {
+    //aggregate is baked in, similar to find() or findOne(), it accepts an array []
+    return this.aggregate([
+        { $unwind: '$tags' },
+        { $group: { _id: '$tags', count: { $sum: 1 } }},
+        { $sort: { count: -1 }}
+    ]);
+}
 
 module.exports = mongoose.model('Store', storeSchema);
