@@ -97,7 +97,12 @@ exports.getStoreBySlug = async (req, res, next) => {
 } 
 
 exports.getStoresByTag = async (req, res) =>{
-    const tags = await Store.getTagsList();
     const tag = req.params.tag;
-    res.render('tag', { tags , title: 'Tags', tag });
+    const tagsPromise = Store.getTagsList();
+    const storesPromise = Store.find({ tags: tag });
+    //two queries, each as a promise, awaited in Promise.all
+    //this way we fire off to independent queries at the same time, but wait until 
+    //everything is done + immediately descruture into variables
+    const [ tags, stores ] =  await Promise.all( [tagsPromise, storesPromise] );
+    res.render('tag', { tags , title: 'Tags', tag, stores });
 }
