@@ -98,6 +98,7 @@ exports.getStoreBySlug = async (req, res, next) => {
 
 exports.getStoresByTag = async (req, res) =>{
     const tag = req.params.tag;
+    //remember getTagsList() is a custom method we added on our schema 
     const tagsPromise = Store.getTagsList();
     const storesPromise = Store.find({ tags: tag });
     //two queries, each as a promise, awaited in Promise.all
