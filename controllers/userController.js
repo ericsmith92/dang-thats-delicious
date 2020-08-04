@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+//we can do this below since we imported model in start.js
+const User = mongoose.model('User');
+const promisify = require('es6-promisify');
 
 exports.loginForm = (req, res) => {
     res.render('login', {title: 'Login'});
@@ -33,4 +36,15 @@ exports.validateRegister = (req, res, next) => {
     }
 
     next(); //there were no errors, lets keep it moving (register + save to db in this case)
-}
+};
+
+//we are also passing next here since this is ALSO a middleware, remember, once a user is 
+//registered we still need to log them in, so we're still 'in the middle'
+exports.register = async (req, res, next) => {
+    const user = new User({ email: req.body.email, name: req.body.name });
+    //making password register method Promise based with promisify
+    //pass method we want to make Promise based + Object to bind to
+    const registerWithPromise = promisify(User.register, User);
+    await registerWithPromise(user, req.body.password);
+    next(); //pass to authController.login
+};
