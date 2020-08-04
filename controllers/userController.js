@@ -48,3 +48,29 @@ exports.register = async (req, res, next) => {
     await registerWithPromise(user, req.body.password);
     next(); //pass to authController.login
 };
+
+exports.account = (req, res) => {
+    res.render('account', { title: 'Edit Account' });
+}
+
+exports.updateAccount = async (req, res) => {
+
+    //we need to grab all data and users have sent us to update
+    const updates = {
+        name: req.body.name,
+        email: req.body.email
+    };
+
+    const user = await User.findOneAndUpdate(
+        { _id: req.user._id},
+        //set what we are passing on ontop of what is already there, we 
+        //might not be passing a 1:1 for each value in DB for this model
+        { $set: updates},
+        { new: true, runValidators: true, context: 'query' }
+    );
+    
+    //'back' passed to redirect just sends them back to where they came from
+    //helpful if we had multiple endpoints hitting this method
+    req.flash('success', 'Updated the profile!');
+    res.redirect('back');
+}

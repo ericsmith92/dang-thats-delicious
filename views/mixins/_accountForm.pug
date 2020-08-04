@@ -1,0 +1,8 @@
+mixin accountForm()
+
+    form(action="/account" method="POST")
+        label(for="name") Name
+        input(type="text" name="name" id="name" value=user.name)
+        label(for="email") Email Address
+        input(type="email" name="email" id="email" value=user.email)
+        input.button(type="submit" value="Update My Account")
