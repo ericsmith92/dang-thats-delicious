@@ -19,7 +19,9 @@ const userSchema = new Schema({
         type: String,
         required: 'Please supply a name',
         trim: true
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
 });
 
 //make a virtual field, this is for something that can just be generated and thus, does not need to be stored
