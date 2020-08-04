@@ -22,6 +22,16 @@ const userSchema = new Schema({
     }
 });
 
+//make a virtual field, this is for something that can just be generated and thus, does not need to be stored
+//for example, if we are storing weight in lbs, we don't need to also store in KG, we can calculate that
+
+userSchema.virtual('gravatar').get(function(){
+    //we used a proper function to access keyword this
+    //this refers to User, so we get the email off that
+    const hash = md5(this.email);
+    return `https://gravatar.com/avatar/${hash}?s=200`;
+});
+
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email'} );
 userSchema.plugin(mongodbErrorHandler);
 

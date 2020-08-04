@@ -9,7 +9,9 @@ const { catchErrors } = require('../handlers/errorHandlers');
 // Do work here
 router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
-router.get('/add', storeController.addStore);
+//super cool below, we first check with out isLoggedIn() middleware on the authController before
+//passing them to addStore since you must be logged in to add a store
+router.get('/add', authController.isLoggedIn, storeController.addStore);
 //remember, createStore method is async await, so we need to wrap it in our catch errors function - referred to as composition
 //here, we are passing our middleware sequentially to this route, before we ultimately hit our createStore controller
 router.post('/add', storeController.upload,
@@ -23,6 +25,7 @@ router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
 
 //new controller for user activities (login, password reset, etc)
 router.get('/login', userController.loginForm);
+router.post('/login', authController.login);
 router.get('/register', userController.registerForm);
 //what about when we POST to register
 //1. Validate registration data
@@ -31,6 +34,8 @@ router.get('/register', userController.registerForm);
 router.post('/register', userController.validateRegister,
                          userController.register,
                          authController.login);
+
+router.get('/logout', authController.logout);
 
 
 module.exports = router;
