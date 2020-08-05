@@ -34,7 +34,17 @@ const storeSchema = new mongoose.Schema({
             required: 'You must supply an address'
         }
     },
-    photo: String
+    photo: String,
+    /*
+    create a relationship between Stores and Users (if user created store) by giving an author
+    field on Schema and setting it to be the ObjectId of the user (mongodb data type)
+    ref points to 'User' (referring to User model)
+    */
+    author: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: 'You must supply an author'
+    }
 });
 
 storeSchema.pre('save', async function(next){

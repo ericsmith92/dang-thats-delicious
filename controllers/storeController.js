@@ -18,11 +18,11 @@ const uuid = require('uuid');
 
 exports.homePage = (req, res) => {
     res.render('index', {title: 'Home'});
-}
+};
 
 exports.addStore = (req, res) => {
     res.render('editStore', {title: 'Add Store'});
-}
+};
 
 //we need our middleware here, before create/update to handle upload
 //remember, we are simply reading it into memory here
@@ -49,28 +49,37 @@ exports.resize = async (req, res, next) => {
     await photo.write(`./public/uploads/${req.body.photo}`);
     //once we have written the photo to our filesystem, keep going!
     next();
-}
+};
 
 exports.createStore = async (req, res) => {
+    req.body.author = req.user._id;
     const store = await (new Store(req.body)).save();
     req.flash('success', `Successfully Created ${store.name}. Care to leave a review?`);
     res.redirect(`/store/${store.slug}`);
-}
+};
 
 exports.getStores = async (req, res) => {
     //1. Query DB for list of all stores
     const stores = await Store.find();
     res.render('stores', {title: 'Stores', stores});
+};
+
+//we are only going to use this function here, so we don't need to export it
+const confirmOwner = (store, user) => {
+    if(!store.author.equals(user._id)){
+        //we throw an error here, so our error handling middleware should pick this up
+       throw Error('You must own a store in order to edit it!');
+    }
 }
 
 exports.editStore = async (req, res) => {
     //1. find store given the ID
     const store = await Store.findOne({_id : req.params.id});
-    console.log(store);
     //2. Confirm they are the owner of the store
+    confirmOwner(store, req.user);
     //3. Render out the edit form so the user can update their store
     res.render('editStore', {title: `Edit ${store.name}`, store});
-}
+};
 
 exports.updateStore = async (req, res) => {
     //1. Set location data to be a Point after update
@@ -83,10 +92,12 @@ exports.updateStore = async (req, res) => {
     req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${store.slug}">View Store</a>`);
     res.redirect(`/stores/${store._id}/edit`);
     //res.json(req.params);
-}
+};
 
 exports.getStoreBySlug = async (req, res, next) => {
-    const store = await Store.findOne({slug: req.params.slug});
+    //we can chain on populate() method to findOne() and get all the info about the author 
+    //field populated from the user to which it belongs since we created relationship
+    const store = await Store.findOne({slug: req.params.slug}).populate('author');
     //remember, if somebody changes the URL there is a chance we will get no store back
     //sooooo...
     if(!store){
@@ -94,7 +105,7 @@ exports.getStoreBySlug = async (req, res, next) => {
         return;
     }
     res.render('store', { title: store.name, store });
-} 
+};
 
 exports.getStoresByTag = async (req, res) =>{
     const tag = req.params.tag;
@@ -106,4 +117,4 @@ exports.getStoresByTag = async (req, res) =>{
     //everything is done + immediately descruture into variables
     const [ tags, stores ] =  await Promise.all( [tagsPromise, storesPromise] );
     res.render('tag', { tags , title: 'Tags', tag, stores });
-}
+};
