@@ -45,4 +45,11 @@ router.post('/account/reset/:token', authController.confirmedPasswords ,
                                      catchErrors(authController.update));
 
 
+/*
+API ENDPOINTS (remember, these are also just routes we are hiting)
+*/
+
+router.get('/api/search', catchErrors(storeController.searchStores));
+
+
 module.exports = router;

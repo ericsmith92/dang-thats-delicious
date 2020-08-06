@@ -47,6 +47,15 @@ const storeSchema = new mongoose.Schema({
     }
 });
 
+//Define our indexes - all of our indexing in MongoDB happens in our Schema
+//we padd the index() method an object of fields we want indexed
+//we want to index our 'name' and 'description' fields as text so we can search through them easily
+//below is a 'compound' index, since we are indexing two fields as one
+storeSchema.index({
+    name: 'text',
+    description: 'text'
+});
+
 storeSchema.pre('save', async function(next){
     if(!this.isModified('name')){
         next(); //skip it

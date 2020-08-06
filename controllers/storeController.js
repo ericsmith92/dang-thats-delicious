@@ -118,3 +118,26 @@ exports.getStoresByTag = async (req, res) =>{
     const [ tags, stores ] =  await Promise.all( [tagsPromise, storesPromise] );
     res.render('tag', { tags , title: 'Tags', tag, stores });
 };
+
+exports.searchStores = async (req, res) => {
+    //our find() needs to take an argument to tell it to search for name and description
+    //properties with whatever query (req.query.q) is passed along
+    //at the end, we are making use of MongoDB meta data, the 'score' key is made up of the 
+    //textScore meta data, in this case, how many occurences of the searched value appear
+    //in the name or description?
+    //we chain on .sort() method to sort results by heighest to lowest on our textScore once again.
+    //this is a MondoDB method, NOT the es6 native sort() method
+    //finally, we want to chain on limit() since we only want 5 back (what if we had 10000 coffee stores)
+    const stores = await Store.find({
+        $text: {
+            $search: req.query.q
+        }
+    }, {
+       score: { $meta: 'textScore'} 
+    })
+    .sort({
+        score: { $meta: 'textScore' }
+    })
+    .limit(5);
+    res.json(stores);
+}
