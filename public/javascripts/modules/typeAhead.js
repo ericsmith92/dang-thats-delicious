@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 function typeAhead(search){
     if (!search) return;
@@ -21,7 +21,11 @@ function typeAhead(search){
         .then(res => {
             if(res.data.length){
                searchResults.innerHTML = searchResultsHTML(res.data);
+               return;
             }
+
+            //tell them no results 
+            searchResults.innerHTML = `<div class="search__result">No results for ${e.target.value} found!</div>`;
         })
         .catch(err => {
             console.log(err);
@@ -34,7 +38,8 @@ function typeAhead(search){
         if(![38, 40, 13].includes(e.keyCode)){
             return;
         }
-      
+
+        /*
             const searchResultItems = searchResults.querySelectorAll('.search__result')
             const focusedElement = checkForFocus(searchResultItems);
 
@@ -60,8 +65,31 @@ function typeAhead(search){
                     searchResultItems[focusedElement - 1].classList.add('search__result--active');
                 }
             }
-    });
+            */
+            const activeClass = 'search__result--active';
+            const current = search.querySelector(`.${activeClass}`);
+            const items = search.querySelectorAll('.search__result');
+            let next;
+            if(e.keyCode === 40 && current){
+                next = current.nextElementSibling || items[0];
+            } else if (e.keyCode === 40){
+                next = items[0];
+            } else if(e.keyCode === 38 && current){
+                next = current.previousElementSibling || items[items.length - 1];
+            } else if (e.keyCode === 38){
+                next = items[items.length - 1];
+            } else if(e.keyCode === 13 && current.href){
+                window.location = current.href;
+                return;
+            }
 
+            if(current){
+                current.classList.remove(activeClass);
+            }
+            next.classList.add(activeClass);
+
+    });
+    /*
     function checkForFocus(nodelist){
         let current;
 
@@ -81,6 +109,7 @@ function typeAhead(search){
             }
         });
     }
+    */
 }
 
 function searchResultsHTML(stores){
