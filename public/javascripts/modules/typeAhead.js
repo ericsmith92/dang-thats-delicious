@@ -1,4 +1,5 @@
 import axios from 'axios';
+import dompurify from 'dompurify';
 
 function typeAhead(search){
     if (!search) return;
@@ -20,12 +21,12 @@ function typeAhead(search){
         axios.get(`/api/search?q=${e.target.value}`)
         .then(res => {
             if(res.data.length){
-               searchResults.innerHTML = searchResultsHTML(res.data);
+               searchResults.innerHTML = dompurify.sanitize(searchResultsHTML(res.data));
                return;
             }
 
             //tell them no results 
-            searchResults.innerHTML = `<div class="search__result">No results for ${e.target.value} found!</div>`;
+            searchResults.innerHTML = dompurify.sanitize(`<div class="search__result">No results for ${e.target.value} found!</div>`);
         })
         .catch(err => {
             console.log(err);

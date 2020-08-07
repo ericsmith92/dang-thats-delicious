@@ -56,6 +56,8 @@ storeSchema.index({
     description: 'text'
 });
 
+//TODO: add another pre save hook to strip HTML before saving to DB
+
 storeSchema.pre('save', async function(next){
     if(!this.isModified('name')){
         next(); //skip it
