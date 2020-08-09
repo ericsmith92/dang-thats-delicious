@@ -178,3 +178,11 @@ exports.heartStore = async (req, res) => {
     console.log(hearts);
     res.json(user);
 };
+
+exports.getHeartedStores = async (req, res) => {
+    const heartedStores = await Store.find({_id : req.user.hearts});
+    console.log(heartedStores);
+    
+    res.render('hearts',{title: 'Hearts', hearts: heartedStores});
+
+}

@@ -55,4 +55,6 @@ router.get('/api/stores/near', catchErrors(storeController.mapStores));
 //below, we are using our API to post to the DB since the User is pushing data (liking/hearting)
 router.post('/api/stores/:id/heart', catchErrors(storeController.heartStore));
 
+router.get('/hearts', catchErrors(storeController.getHeartedStores));
+
 module.exports = router;
