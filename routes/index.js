@@ -44,6 +44,8 @@ router.get('/account/reset/:token', catchErrors(authController.reset));
 router.post('/account/reset/:token', authController.confirmedPasswords ,
                                      catchErrors(authController.update));
 
+router.get('/hearts', authController.isLoggedIn, catchErrors(storeController.getHeartedStores));
+
 
 /*
 API ENDPOINTS (remember, these are also just routes we are hiting)
@@ -54,7 +56,5 @@ router.get('/api/stores/near', catchErrors(storeController.mapStores));
 //above, we are just querying DB, so these are get requests
 //below, we are using our API to post to the DB since the User is pushing data (liking/hearting)
 router.post('/api/stores/:id/heart', catchErrors(storeController.heartStore));
-
-router.get('/hearts', catchErrors(storeController.getHeartedStores));
 
 module.exports = router;

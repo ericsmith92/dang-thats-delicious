@@ -180,9 +180,12 @@ exports.heartStore = async (req, res) => {
 };
 
 exports.getHeartedStores = async (req, res) => {
-    const heartedStores = await Store.find({_id : req.user.hearts});
+    //query for Store ids that are IN our array of hearted stores (on the User model)
+    const heartedStores = await Store.find({
+        _id : { $in: req.user.hearts }
+    });
     console.log(heartedStores);
     
-    res.render('hearts',{title: 'Hearts', hearts: heartedStores});
+    res.render('stores',{title: 'Hearts', stores: heartedStores});
 
 }
