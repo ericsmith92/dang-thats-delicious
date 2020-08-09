@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Store = mongoose.model('Store');
+const User = mongoose.model('User');
 const multer = require('multer');
 const multerOptions = {
     storage: multer.memoryStorage(),
@@ -162,4 +163,18 @@ exports.mapStores = async (req, res) => {
     //const stores = await Store.find(q).select('-author -tags');
     //above is alternate syntax to exclude fields we don't want
     res.json(stores);
+};
+
+exports.heartStore = async (req, res) => {
+    //1. we need a list of users hearted stores, if they already have this store hearted, remove it
+    //if they don't, add it
+    const hearts = req.user.hearts.map(obj => obj.toString());
+    const operator = hearts.includes(req.params.id) ? '$pull' : '$addToSet';
+    const user = await User.findByIdAndUpdate(req.user._id,
+                                              {[operator]: { hearts: req.params.id }},
+                                              { new: true }
+                ); 
+
+    console.log(hearts);
+    res.json(user);
 };

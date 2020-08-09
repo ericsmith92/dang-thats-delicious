@@ -21,7 +21,11 @@ const userSchema = new Schema({
         trim: true
     },
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    //below, we are telling mongo that hearts is going to be an array of IDs that refer to a store
+    hearts: [
+        {type: mongoose.Schema.ObjectId, ref: 'Store'}
+    ] 
 });
 
 //make a virtual field, this is for something that can just be generated and thus, does not need to be stored
