@@ -48,13 +48,19 @@ const storeSchema = new mongoose.Schema({
 });
 
 //Define our indexes - all of our indexing in MongoDB happens in our Schema
-//we padd the index() method an object of fields we want indexed
+//we pass the index() method an object of fields we want indexed
 //we want to index our 'name' and 'description' fields as text so we can search through them easily
 //below is a 'compound' index, since we are indexing two fields as one
 storeSchema.index({
     name: 'text',
     description: 'text'
 });
+
+//lets make a new index for location, we are going to make it geospatial
+//it will store meta data about location as geospatial (easy to search nearby lat and lngs)
+
+storeSchema.index({ location: '2dsphere'} );
+
 
 //TODO: add another pre save hook to strip HTML before saving to DB
 

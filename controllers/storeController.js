@@ -140,4 +140,26 @@ exports.searchStores = async (req, res) => {
     })
     .limit(5);
     res.json(stores);
-}
+};
+
+exports.mapStores = async (req, res) => {
+    const coordinates = [req.query.lng, req.query.lat].map(parseFloat);
+    //remember anything in this query object is MongoDB spefic, refer to the docs, these aren't pulled out of thin air and are not vanilla node
+    const q = {
+        location:{
+            $near: {
+               $geometry:{
+                   type: 'Point',
+                   coordinates
+               },
+               $maxDistance: 10000 // 10km
+            }
+        }
+    }
+    //the select() method can be chained onto the find() method to only query for fields we 
+    //want back, (id will alwys come back as well)
+    const stores = await Store.find(q).select('slug name description location').limit(10);
+    //const stores = await Store.find(q).select('-author -tags');
+    //above is alternate syntax to exclude fields we don't want
+    res.json(stores);
+};
