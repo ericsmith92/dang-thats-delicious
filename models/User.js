@@ -23,6 +23,7 @@ const userSchema = new Schema({
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     //below, we are telling mongo that hearts is going to be an array of IDs that refer to a store
+    //this is a relationship to the Store model
     hearts: [
         {type: mongoose.Schema.ObjectId, ref: 'Store'}
     ] 
