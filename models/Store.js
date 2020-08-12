@@ -45,6 +45,10 @@ const storeSchema = new mongoose.Schema({
         ref: 'User',
         required: 'You must supply an author'
     }
+},{
+    //we want virtual fields to populate in JSON output and Object dumps
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 
 //Define our indexes - all of our indexing in MongoDB happens in our Schema
@@ -94,6 +98,16 @@ storeSchema.statics.getTagsList = function() {
         { $group: { _id: '$tags', count: { $sum: 1 } }},
         { $sort: { count: -1 }}
     ]);
-}
+};
+
+//we are gonna use something native to mongoose called virtual populate to essentially perform
+//an additional query to get reviews associated with stores
+//localField && foreignField are like PK and FK in relational DBs - and this is like a join
+// 'find review where the stores _d property === reviews store property'
+storeSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id', //which field on the store?
+    foreignField: 'store' //which field on the review?
+});
 
 module.exports = mongoose.model('Store', storeSchema);
