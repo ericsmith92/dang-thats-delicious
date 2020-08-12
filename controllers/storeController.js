@@ -60,9 +60,27 @@ exports.createStore = async (req, res) => {
 };
 
 exports.getStores = async (req, res) => {
+    //get the page from the URL, if we are on the homepage set to 1
+    const page = req.params.page || 1;
+    const limit = 4;
+    const skip = (page * limit) - limit;
     //1. Query DB for list of all stores
-    const stores = await Store.find();
-    res.render('stores', {title: 'Stores', stores});
+    const storesPromise = Store
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .sort({created: 'desc'});
+
+    const countPromise = Store.count();
+
+    const [stores, count ] = await Promise.all([storesPromise, countPromise]);
+
+    const pages = Math.ceil(count / limit);
+    if(!stores.length && skip){
+        req.flash('info', `Hey! You asked for page ${page}, but that doesn't exist, so I put you on page ${pages}`);
+        res.redirect(`/stores/page/${pages}`);
+    }
+    res.render('stores', {title: 'Stores', stores, page, pages, count});
 };
 
 //we are only going to use this function here, so we don't need to export it

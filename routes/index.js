@@ -10,6 +10,7 @@ const { catchErrors } = require('../handlers/errorHandlers');
 // Do work here
 router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
+router.get('/stores/page/:page', catchErrors(storeController.getStores));
 //super cool below, we first check with out isLoggedIn() middleware on the authController before
 //passing them to addStore since you must be logged in to add a store
 router.get('/add', authController.isLoggedIn, storeController.addStore);
