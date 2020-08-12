@@ -98,7 +98,7 @@ exports.updateStore = async (req, res) => {
 exports.getStoreBySlug = async (req, res, next) => {
     //we can chain on populate() method to findOne() and get all the info about the author 
     //field populated from the user to which it belongs since we created relationship
-    const store = await Store.findOne({slug: req.params.slug}).populate('author');
+    const store = await Store.findOne({slug: req.params.slug}).populate('author reviews');
     //remember, if somebody changes the URL there is a chance we will get no store back
     //sooooo...
     if(!store){

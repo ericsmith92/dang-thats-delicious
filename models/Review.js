@@ -28,4 +28,14 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
+//middlewear to populate the author based on the ID
+function autoPopulate(next) {
+    this.populate('author');
+    next();
+}
+
+//add hook for autopuplate to schema
+reviewSchema.pre('find', autoPopulate);
+reviewSchema.pre('findOne', autoPopulate);
+
 module.exports = mongoose.model('Review', reviewSchema);
