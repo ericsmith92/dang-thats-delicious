@@ -48,6 +48,8 @@ router.post('/account/reset/:token', authController.confirmedPasswords ,
 router.get('/hearts', authController.isLoggedIn, catchErrors(storeController.getHeartedStores));
 router.post('/reviews/:id', authController.isLoggedIn ,catchErrors(reviewController.addReview));
 
+router.get('/top', catchErrors(storeController.getTopStores));
+
 
 /*
 API ENDPOINTS (remember, these are also just routes we are hiting)

@@ -189,3 +189,9 @@ exports.getHeartedStores = async (req, res) => {
     res.render('stores',{title: 'Hearts', stores: heartedStores});
 
 }
+
+exports.getTopStores = async (req, res) => {
+    //here, getTopStores() is going to be our own custom method on the Store model
+    const stores = await Store.getTopStores();
+    res.render('topStores', { title: 'Top Stores', stores });
+}
